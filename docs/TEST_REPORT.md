@@ -13,7 +13,7 @@
 | Frontend typecheck | `npm run typecheck` | pass | — | — | — |
 | Frontend build | `npm run build` | pass | — | — | — |
 | E2E (desktop + mobile) | `npx playwright test` | 10 | 0 | 0 | 0 |
-| Coverage (`--cov`) | — | — | — | — | not run (pytest-cov not installed) |
+| Coverage (`--cov`) | `pytest --cov=app --cov-report=term-missing` | 91% total, 0 fail | 0 | 0 | 0 |
 | CI workflow | `.github/workflows/ci.yml` (runs on GitHub push) | see Actions tab | — | — | — |
 | Live deployment | prod smoke (Vercel→Render→Open-Meteo) | pass (1) | 0 | 0 | 0 |
 
@@ -21,8 +21,13 @@ Backend breakdown (125): heatwave 17 · normalization 12 · trends 9 · mann-ken
 validation 28 · weather-client 18 · API/security 15 · cache 9 · mongo-store 7 ·
 performance 3 · conftest fixtures.
 (Counts verified via `pytest --collect-only`; include parametrized cases.)
-Frontend breakdown (20): validation 8 · AnalyzerPage 8 · CSV 1 · MapPicker 3.
+Frontend breakdown (20): validation 8 · AnalyzerPage 8 · CSV 1 · MapPicker 3
+(verified per-file via verbose run).
 E2E breakdown (10): 5 scenarios × desktop + mobile viewports.
+
+Backend coverage 91% overall; climate logic is the best-covered part: heatwave 98%,
+normalization 94%, trends 93%. Thinner areas are honest: weather_client 86% (live-network
+branches excluded by design), store 83% (real-server paths), analysis 87%.
 
 ## Regressions found and fixed during development
 
@@ -46,10 +51,11 @@ No test was disabled, weakened, or deleted to obtain a green build.
 
 ## Security scans
 
-- `pip-audit --requirement requirements.txt`: **0 vulnerabilities** (after upgrading
-  fastapi 0.116→0.143, starlette 0.47→1.7, pymongo→4.18.2, anyio→4.14.2, pytest→9.0.3,
-  pytest-asyncio→1.4.0; suite re-run green after each bump).
-- Full-environment `pip-audit`: 61 findings in unrelated system packages
+- `pip-audit --requirement requirements-dev.txt`: **0 vulnerabilities** (runtime +
+  dev/test tooling, pytest-cov included; reached by upgrading fastapi 0.116→0.143,
+  starlette 0.47→1.7, pymongo→4.18.2, anyio→4.14.2, pytest→9.0.3,
+  pytest-asyncio→1.4.0, suite re-run green after each bump).
+- Full-environment `pip-audit`: findings only in unrelated system packages
   (torch, authlib, mcp, …) — outside this project's dependency tree.
 - `npm audit`: 13 remaining, all in dev-only tooling (vitest/vite/esbuild advisories
   affecting the local dev server/test runner, never shipped in `dist/`). Reduced from
@@ -76,5 +82,7 @@ No test was disabled, weakened, or deleted to obtain a green build.
 - Real end-to-end analysis via HTTP (Delhi 2015–2020): threshold 41.3 °C, 11 events,
   decreasing descriptive trend −42.86% with caveats; cache miss→hit confirmed.
 - Real provider smoke test (2019–2020 sample): 731 days, °C, HTTP 200.
+- Production posture: `/api/v1/health` → 200, `/docs` and `/openapi.json` → 404
+  (confirms `ENVIRONMENT=production` on Render).
 - Invalid-input, 429, 502, and 500 paths exercised through HTTP tests with
   no-stack-trace / no-secret assertions.

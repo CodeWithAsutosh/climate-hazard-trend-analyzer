@@ -3,7 +3,7 @@
 Analyze historical **heatwave** trends for a selected region and period. The backend
 retrieves daily maximum-temperature data from the Open-Meteo historical archive,
 detects heatwave events with a documented, reproducible rule, and the React frontend
-visualizes annual frequency, duration, intensity, and a descriptive trend summary —
+visualizes annual frequency, duration, intensity, and a descriptive trend summary -
 with honest data-quality warnings throughout.
 
 > **Live deployment (verified 2026-10-15):**
@@ -11,14 +11,14 @@ with honest data-quality warnings throughout.
 > - Frontend: https://climate-hazard-trend-analyzer-steel.vercel.app/
 > - Backend API: https://climate-hazard-trend-analyzer-33r3.onrender.com
 >   (`/api/v1/health` ok; cold analysis ~2.3 s miss → warm repeat hit;
->   invalid input 422; MongoDB persistence restart-proofed — see test report).
+>   invalid input 422; MongoDB persistence restart-proofed - see test report).
 >
 > Run the stack locally with the steps below.
 
 ## Features
 
 - Region selection: single lat/lon point **or** custom bounding box (≤ 5°×5°, ≤ 25 deg²,
-   analyzed via its centroid — disclosed in UI and API). Point mode includes an
+   analyzed via its centroid - disclosed in UI and API). Point mode includes an
    interactive Leaflet map (click to set coordinates; tiles © OpenStreetMap contributors).
 - Hazard selector with **Heatwave selected by default** (currently the only supported hazard).
 - Custom analysis period (≤ 60 years, 1940–present) and configurable baseline
@@ -57,10 +57,10 @@ Major components: see `backend/app/` and `frontend/src/`. Key decisions are reco
 
 - Python 3.11+ (tested on 3.13), Node.js 20+ (tested on Node 25 / npm 11).
 - MongoDB: optional locally (without `MONGODB_URI` the backend uses a documented
-  in-memory store); **required and configured in production** — the deployed API is
+  in-memory store); **required and configured in production** - the deployed API is
   MongoDB-backed (restart-proofed, see test report).
 - Internet access for the backend to reach `https://archive-api.open-meteo.com`
-  (mocked in all automated tests; live verifications performed — see test report).
+  (mocked in all automated tests; live verifications performed - see test report).
 
 ## Local installation and startup
 
@@ -69,7 +69,7 @@ Backend:
 ```bash
 cd backend
 pip install -r requirements-dev.txt   # runtime + test/lint tooling
-# (deployment installs requirements.txt — runtime only)
+# (deployment installs requirements.txt - runtime only)
 cp .env.example .env   # edit values; .env is git-ignored
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 
@@ -117,7 +117,7 @@ Frontend (`frontend/.env.example`): `VITE_API_BASE_URL` (empty = same origin; pu
    a live server is verified during deploy (inserting a duplicate must fail).
 - Use a dedicated least-privilege user, TLS, and IP allowlisting in production.
 - Without `MONGODB_URI`, the hybrid store keeps records in memory (documented fallback
-   for development/test; not suitable for multi-instance production — see limitations).
+   for development/test; not suitable for multi-instance production - see limitations).
 
 ## Data provider and attribution
 
@@ -200,7 +200,7 @@ Status codes: `200` ok · `400` malformed JSON · `413` too large · `415` wrong
 ```bash
 # Backend (125 tests: see docs/TEST_REPORT.md for the per-file breakdown)
 cd backend && pytest
-pytest --cov=app --cov-report=term-missing   # needs pytest-cov (not installed)
+pytest --cov=app --cov-report=term-missing   # 91% total (see test report)
 ruff check app tests && ruff format --check app tests
 mypy app
 
@@ -259,7 +259,7 @@ must be set at the hosting layer; residual devDependency audit findings document
 - E2E mocks the API (no live weather dependence); map interaction is verified in a real
   browser (click-to-select test); an opt-in prod smoke spec exercises the live
   Vercel→Render→Open-Meteo stack (`E2E_BASE_URL=... npx playwright test prod-smoke`).
-  CI runs on GitHub push (`.github/workflows/ci.yml`) — see the repo's Actions tab.
+  CI runs on GitHub push (`.github/workflows/ci.yml`) - see the repo's Actions tab.
 - With more time: geocoding, seasonal (day-of-year) thresholds, PDF export,
   shared rate limiting, custom domain, and monitoring/alerting.
 
@@ -268,8 +268,8 @@ must be set at the hosting layer; residual devDependency audit findings document
 Built with **Muse Spark (via OpenCode)** as the implementation assistant: scaffolding,
 backend services, frontend components, and the full test suite were drafted with AI help
 and then executed, debugged, and verified locally (all test/lint/build/security commands
-were actually run; failures — a bool-coercion bug, jsdom gaps, broken pip state, audit
-findings — were investigated and fixed, with regressions covered by tests).
+were actually run; failures - a bool-coercion bug, jsdom gaps, broken pip state, audit
+findings - were investigated and fixed, with regressions covered by tests).
 Follow-up additions built the same way: Mann–Kendall/Sen's slope (verified against
 hand-computed S/z/p fixtures), mongomock-backed MongoDB path tests (which exposed and
 fixed a bulk-write compatibility gap via a per-document fallback), CSV export, and the

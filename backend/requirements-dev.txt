@@ -2,6 +2,7 @@
 -r requirements.txt
 pytest==9.0.3
 pytest-asyncio==1.4.0
+pytest-cov==7.1.0
 mongomock==4.3.0
 ruff==0.12.12
 mypy==1.17.1
