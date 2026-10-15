@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements-dev.txt
+        working-directory: .
+      - name: Ruff check
+        run: ruff check app tests
+        working-directory: backend
+      - name: Ruff format check
+        run: ruff format --check app tests
+        working-directory: backend
+      - name: Mypy
+        run: mypy app
+        working-directory: backend
+      - name: Backend tests
+        run: pytest -q
+        working-directory: backend
+        env:
+          ENVIRONMENT: test
+      - name: Dependency audit (informational)
+        run: pip-audit --requirement requirements.txt --local || true
+        working-directory: backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Lint
+        run: npm run lint
+        working-directory: frontend
+      - name: Typecheck
+        run: npm run typecheck
+        working-directory: frontend
+      - name: Component tests
+        run: npm run test
+        working-directory: frontend
+      - name: Production build
+        run: npm run build
+        working-directory: frontend
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: End-to-end tests
+        run: npx playwright test --project=chromium
+        working-directory: frontend

@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  color-scheme: light;
+  --color-primary: #059669;
+  --color-primary-dark: #047857;
+  --color-secondary: #10b981;
+  --color-background: #ecfdf5;
+  --color-foreground: #064e3b;
+  --color-card: #ffffff;
+  --color-muted: #e8f1f3;
+  --color-muted-fg: #475569;
+  --color-border: #a7f3d0;
+  --color-destructive: #dc2626;
+  --color-ring: #059669;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --font-sans: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+  background: var(--color-background);
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  min-width: 0;
+}
+
+/* Header */
+header {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-6) var(--space-8);
+  margin-bottom: var(--space-6);
+  box-shadow: 0 8px 24px rgb(6 78 59 / 0.08);
+}
+
+header h1 {
+  margin: 0 0 var(--space-2) 0;
+  font-size: 1.75rem;
+}
+
+header p {
+  margin: 0;
+  color: var(--color-muted-fg);
+  max-width: 70ch;
+}
+
+/* Layout: minmax(0, …) + min-width:0 stops charts overflowing the grid */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.layout > * {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Form card */
+.controls form {
+  background: var(--color-card);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgb(6 78 59 / 0.06);
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin: 0 0 var(--space-4) 0;
+  padding: var(--space-3);
+  min-width: 0;
+}
+
+legend {
+  font-weight: 600;
+  padding: 0 var(--space-2);
+}
+
+.field {
+  margin-bottom: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.field label {
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.field input,
+.field select {
+  padding: var(--space-2) var(--space-3);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-foreground);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  max-width: 100%;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--color-destructive);
+}
+
+.field-error {
+  color: var(--color-destructive);
+  margin: var(--space-1) 0 0;
+  font-size: 0.9rem;
+}
+
+.hint {
+  color: var(--color-muted-fg);
+  font-size: 0.9rem;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 480px) {
+  .grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Buttons */
+button {
+  padding: 0.6rem 1.2rem;
+  min-height: 44px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Results */
+.results {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.results > section,
+.results > figure {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-shadow: 0 4px 16px rgb(6 78 59 / 0.06);
+}
+
+.results-bar {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+figure {
+  margin: 0;
+  min-width: 0;
+}
+
+figcaption {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+figure .recharts-wrapper,
+figure .recharts-surface {
+  max-width: 100%;
+}
+
+details {
+  margin-top: var(--space-3);
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 500;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* State panels */
+.state {
+  background: var(--color-card);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.state.error {
+  border: 2px solid var(--color-destructive);
+}
+
+.warnings {
+  border: 2px solid #b45309;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: #fffbeb;
+  color: #451a03;
+}
+
+.meta dt {
+  font-weight: 600;
+}
+
+.meta dd {
+  margin: 0 0 var(--space-2) 0;
+  overflow-wrap: anywhere;
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  border: 1px solid var(--color-border);
+  padding: 0.35rem 0.6rem;
+  text-align: right;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+thead th {
+  background: var(--color-muted);
+  position: sticky;
+  top: 0;
+}
+
+/* Map */
+.map-wrap {
+  margin-top: var(--space-2);
+  min-width: 0;
+}
+
+.map-wrap .leaflet-container {
+  border-radius: var(--radius-sm);
+  z-index: 0;
+  max-width: 100%;
+}
+
+/* Spinner */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+
+  button {
+    transition: none;
+  }
+}
+
+footer {
+  margin-top: var(--space-8);
+  color: var(--color-muted-fg);
+  font-size: 0.9rem;
+  max-width: 80ch;
+}
+
+code,
+.table-wrap td {
+  font-family: var(--font-mono);
+}

@@ -1,0 +1,41 @@
+# Secrets and local environment
+.env
+*.env
+!.env.example
+backend/.env
+frontend/.env
+
+# Keys, dumps, logs, local databases
+*.pem
+*.key
+*.log
+*.sqlite
+*.sqlite3
+*.pdf
+dump/
+backups/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+audit.json
+htmlcov/
+.coverage
+
+# Node / frontend
+node_modules/
+frontend/dist/
+playwright-report/
+test-results/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
