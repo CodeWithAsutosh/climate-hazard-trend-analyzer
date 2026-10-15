@@ -14,7 +14,7 @@
 | Frontend build | `npm run build` | pass | — | — | — |
 | E2E (desktop + mobile) | `npx playwright test` | 10 | 0 | 0 | 0 |
 | Coverage (`--cov`) | — | — | — | — | not run (pytest-cov not installed) |
-| CI workflow | `.github/workflows/ci.yml` | — | — | — | not run (no GitHub remote configured) |
+| CI workflow | `.github/workflows/ci.yml` (runs on GitHub push) | see Actions tab | — | — | — |
 | Live deployment | prod smoke (Vercel→Render→Open-Meteo) | pass (1) | 0 | 0 | 0 |
 
 Backend breakdown (125): heatwave 17 · normalization 12 · trends 9 · mann-kendall 7 ·

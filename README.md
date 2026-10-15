@@ -60,7 +60,7 @@ Major components: see `backend/app/` and `frontend/src/`. Key decisions are reco
   in-memory store); **required and configured in production** — the deployed API is
   MongoDB-backed (restart-proofed, see test report).
 - Internet access for the backend to reach `https://archive-api.open-meteo.com`
-   (mocked in all automated tests; one manual live smoke test was performed).
+  (mocked in all automated tests; live verifications performed — see test report).
 
 ## Local installation and startup
 
@@ -212,7 +212,8 @@ cd frontend && npx playwright install chromium && npx playwright test
 
 ```
 
-Live-provider tests are opt-in/manual only (one smoke test performed; see test report).
+Live-provider tests are opt-in/manual only (several live verifications performed;
+see test report).
 
 ## Security controls and limitations
 
@@ -224,8 +225,9 @@ server-side cache keys; safe error envelopes with correlation IDs; structured lo
 without secrets/bodies; security headers (`nosniff`, `frame DENY`, referrer policy);
 docs disabled in production; no secrets in frontend bundle; React-escaped rendering only.
 
-Limitations (honest): single-instance in-memory rate limiter/store unless MongoDB/shared
-infra is configured; no authentication (public read-only demo by design); CSP/HSTS/TLS
+Limitations (honest): single-instance in-memory rate limiter (needs a shared store for
+multi-instance deploys); the store is MongoDB in production and in-memory only for local
+dev without a URI; no authentication (public read-only demo by design); CSP/HSTS/TLS
 must be set at the hosting layer; residual devDependency audit findings documented in
 `docs/TEST_REPORT.md`. This app is __not claimed to be completely secure__.
 
@@ -238,7 +240,8 @@ must be set at the hosting layer; residual devDependency audit findings document
    CSP, HSTS, and other headers at the host/CDN. Allow `tile.openstreetmap.org` in
    `img-src` (and `connect-src` if tiles are fetched via XHR) for the Leaflet map.
 4. Verify on deploy: health, one real analysis, cache hit, invalid input, rate limit,
-   and log redaction. See the deployment checklist in the implementation plan.
+   `/docs` returning 404 (proof `ENVIRONMENT=production`), and log redaction.
+   `render.yaml` holds the service definition (start command, health-check path).
 
 ## Known limitations and future improvements
 
@@ -253,10 +256,12 @@ must be set at the hosting layer; residual devDependency audit findings document
 - Non-seasonal threshold; Mann–Kendall uses the normal approximation (rough for n < 8,
    disclosed); descriptive trends only.
 - No background jobs: very long periods are bounded (60 y) but slow on cold cache.
-- E2E mocks the API (no live weather dependence) except the real-browser map test;
-   CI workflow written but not executed on GitHub (no repo/remote configured here).
+- E2E mocks the API (no live weather dependence); map interaction is verified in a real
+  browser (click-to-select test); an opt-in prod smoke spec exercises the live
+  Vercel→Render→Open-Meteo stack (`E2E_BASE_URL=... npx playwright test prod-smoke`).
+  CI runs on GitHub push (`.github/workflows/ci.yml`) — see the repo's Actions tab.
 - With more time: geocoding, seasonal (day-of-year) thresholds, PDF export,
-   Redis/shared rate limiting, and hosted deployment.
+  shared rate limiting, custom domain, and monitoring/alerting.
 
 ## AI tools used
 
