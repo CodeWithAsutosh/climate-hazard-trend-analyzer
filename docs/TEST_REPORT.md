@@ -69,6 +69,10 @@ No test was disabled, weakened, or deleted to obtain a green build.
 
 ## Manual verification performed
 
+- Live MongoDB persistence: primed Mumbai 2000–2009 analysis (miss, key
+  `300cdab9434f`), restarted the Render service, repeated the identical request →
+  `hit` on the same key. Memory-only caching cannot survive a restart.
+
 - Real end-to-end analysis via HTTP (Delhi 2015–2020): threshold 41.3 °C, 11 events,
   decreasing descriptive trend −42.86% with caveats; cache miss→hit confirmed.
 - Real provider smoke test (2019–2020 sample): 731 days, °C, HTTP 200.

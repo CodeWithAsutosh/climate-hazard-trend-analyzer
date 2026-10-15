@@ -240,9 +240,9 @@ must be set at the hosting layer; residual devDependency audit findings document
 
 ## Known limitations and future improvements
 
-- No live MongoDB cluster in this workspace: the MongoDB code path is verified via
-   mongomock-backed tests; unique-index enforcement and Atlas wiring remain manual
-   deploy-time checks.
+- MongoDB persistence verified live on the deployed backend (identical request
+  returned `hit` after a full Render service restart); mongomock-backed tests cover
+  the store code path locally.
 - Bbox = centroid grid cell (disclosed); map covers point mode only; no named-city
    geocoding yet.
 - Non-seasonal threshold; Mann–Kendall uses the normal approximation (rough for n < 8,
