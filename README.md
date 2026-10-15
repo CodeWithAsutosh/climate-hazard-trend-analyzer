@@ -56,8 +56,9 @@ Major components: see `backend/app/` and `frontend/src/`. Key decisions are reco
 ## Prerequisites
 
 - Python 3.11+ (tested on 3.13), Node.js 20+ (tested on Node 25 / npm 11).
-- MongoDB optional: without `MONGODB_URI` the backend uses a documented in-memory store
-   (data does not survive restarts). Set `MONGODB_URI` for persistence.
+- MongoDB: optional locally (without `MONGODB_URI` the backend uses a documented
+  in-memory store); **required and configured in production** — the deployed API is
+  MongoDB-backed (restart-proofed, see test report).
 - Internet access for the backend to reach `https://archive-api.open-meteo.com`
    (mocked in all automated tests; one manual live smoke test was performed).
 
