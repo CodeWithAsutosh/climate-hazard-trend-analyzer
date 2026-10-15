@@ -6,15 +6,14 @@ detects heatwave events with a documented, reproducible rule, and the React fron
 visualizes annual frequency, duration, intensity, and a descriptive trend summary —
 with honest data-quality warnings throughout.
 
-> No deployment has been performed in this workspace; there is no public demo URL.
-> Run the stack locally with the steps below.
->
-> Deployment targets (fill in after deploying):
+> **Live deployment (verified 2026-10-15):**
 >
 > - Frontend: https://climate-hazard-trend-analyzer-steel.vercel.app/
 > - Backend API: https://climate-hazard-trend-analyzer-33r3.onrender.com
->    (health: `https://climate-hazard-trend-analyzer-33r3.onrender.com/api/v1/health` —
->    verified live: cold analysis ~2.3 s miss, warm repeat hit, invalid input 422)
+>   (`/api/v1/health` ok; cold analysis ~2.3 s miss → warm repeat hit;
+>   invalid input 422; MongoDB persistence restart-proofed — see test report).
+>
+> Run the stack locally with the steps below.
 
 ## Features
 
@@ -136,8 +135,10 @@ Frontend (`frontend/.env.example`): `VITE_API_BASE_URL` (empty = same origin; pu
    baseline days (≥ 100 required, else HTTP 422).
 - __Percentile method__: linear interpolation (numpy-`linear` equivalent), computed in
    `services/heatwave.py::percentile_linear`.
-- **Seasonality**: threshold is **constant year-round** (non-seasonal). This is simple and
-   disclosed, but can misclassify shoulder-season extremes — a documented limitation.
+- **Seasonality**: threshold is **constant year-round** (non-seasonal). Implication:
+  the threshold is dominated by summer heat, so results track summer heatwaves well
+  but winter warm spells will not register and shoulder-season extremes can be
+  misclassified. A day-of-year seasonal threshold would fix this at higher complexity.
 - **Missing data**: missing/invalid days and calendar gaps **break a run**; values are
    never interpolated and never treated as zero.
 - **Event counting**: one event per maximal qualifying run (5 days = 1 event, not 3).
@@ -196,16 +197,16 @@ Status codes: `200` ok · `400` malformed JSON · `413` too large · `415` wrong
 ## Test commands
 
 ```bash
-# Backend (108 unit/integration/security + 3 perf = 111 tests)
+# Backend (125 tests: see docs/TEST_REPORT.md for the per-file breakdown)
 cd backend && pytest
 pytest --cov=app --cov-report=term-missing   # needs pytest-cov (not installed)
 ruff check app tests && ruff format --check app tests
 mypy app
 
-# Frontend (16 Vitest tests)
+# Frontend (20 Vitest tests)
 cd frontend && npm run lint && npm run typecheck && npm run test && npm run build
 
-# End-to-end (8 Playwright tests: 4 scenarios × desktop + mobile)
+# End-to-end (10 Playwright tests: 5 scenarios × desktop + mobile)
 cd frontend && npx playwright install chromium && npx playwright test
 
 ```
@@ -243,8 +244,11 @@ must be set at the hosting layer; residual devDependency audit findings document
 - MongoDB persistence verified live on the deployed backend (identical request
   returned `hit` after a full Render service restart); mongomock-backed tests cover
   the store code path locally.
-- Bbox = centroid grid cell (disclosed); map covers point mode only; no named-city
-   geocoding yet.
+- Bbox = centroid grid cell (disclosed in UI, API warning, and methodology): results
+  describe one grid cell, not a spatial average. Implication: the larger or more
+  climatically varied the box, the less representative the result; the 5°×5° cap
+  bounds this error. Full grid aggregation is deferred work. Map covers point mode
+  only; no named-city geocoding.
 - Non-seasonal threshold; Mann–Kendall uses the normal approximation (rough for n < 8,
    disclosed); descriptive trends only.
 - No background jobs: very long periods are bounded (60 y) but slow on cold cache.

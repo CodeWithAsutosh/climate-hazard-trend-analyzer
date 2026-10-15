@@ -1,4 +1,4 @@
-# Test Report (executed 2026-10-13, Windows, Python 3.13, Node 25)
+# Test Report (executed 2026-10-13; counts re-verified 2026-10-15, Windows, Python 3.13, Node 25)
 
 ## Summary
 
@@ -15,12 +15,12 @@
 | E2E (desktop + mobile) | `npx playwright test` | 10 | 0 | 0 | 0 |
 | Coverage (`--cov`) | — | — | — | — | not run (pytest-cov not installed) |
 | CI workflow | `.github/workflows/ci.yml` | — | — | — | not run (no GitHub remote configured) |
-| Live deployment | — | — | — | — | not run (no deployment performed) |
+| Live deployment | prod smoke (Vercel→Render→Open-Meteo) | pass (1) | 0 | 0 | 0 |
 
 Backend breakdown (125): heatwave 17 · normalization 12 · trends 9 · mann-kendall 7 ·
-validation 24 · weather-client 18 · API/security 17 · cache 9 · mongo-store 7 ·
+validation 28 · weather-client 18 · API/security 15 · cache 9 · mongo-store 7 ·
 performance 3 · conftest fixtures.
-(Counts include parametrized cases.)
+(Counts verified via `pytest --collect-only`; include parametrized cases.)
 Frontend breakdown (20): validation 8 · AnalyzerPage 8 · CSV 1 · MapPicker 3.
 E2E breakdown (10): 5 scenarios × desktop + mobile viewports.
 
