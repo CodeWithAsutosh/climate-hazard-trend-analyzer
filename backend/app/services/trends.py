@@ -25,7 +25,7 @@ TREND_METHOD = (
 )
 
 
-def mann_kendall(values: list[float]) -> dict:
+def mann_kendall(values: list[float], years: list[int] | None = None) -> dict:
     """Mann-Kendall trend test (two-sided) with tie correction + Sen's slope.
 
     Pure-Python implementation of the standard test:
@@ -33,12 +33,22 @@ def mann_kendall(values: list[float]) -> dict:
     correction; p from the standard normal CDF. Returns an insufficient_data
     marker when n < 4. For n < 8 the normal approximation is rough and a
     caveat is included.
+
+    Sen's slope is the median of pairwise slopes per *year*. Pass `years` so the
+    slope uses the actual calendar gap: the series is filtered to years with
+    sufficient coverage, so sample index != year offset whenever a year is
+    dropped. Without `years` the unit index step is used (consecutive years).
     """
     n = len(values)
     base = {
         "alpha": MK_ALPHA,
         "n": n,
     }
+    if years is not None:
+        if len(years) != n:
+            raise ValueError("years must have the same length as values")
+        if any(years[i] >= years[i + 1] for i in range(n - 1)):
+            raise ValueError("years must be strictly increasing")
     if n < MK_MIN_N or any(not math.isfinite(v) for v in values):
         return {
             **base,
@@ -83,9 +93,12 @@ def mann_kendall(values: list[float]) -> dict:
         trend = "decreasing"
     else:
         trend = "no_trend"
-    # Sen's slope: median of pairwise slopes per unit index step
+    # Sen's slope: median of pairwise slopes per year. Use the real year gap
+    # when provided, so years dropped for low coverage don't inflate the rate.
     slopes = sorted(
-        (values[j] - values[i]) / (j - i) for i in range(n) for j in range(i + 1, n)
+        (values[j] - values[i]) / ((years[j] - years[i]) if years is not None else (j - i))
+        for i in range(n)
+        for j in range(i + 1, n)
     )
     m = len(slopes)
     sens = slopes[m // 2] if m % 2 == 1 else (slopes[m // 2 - 1] + slopes[m // 2]) / 2
@@ -192,7 +205,10 @@ def ols_slope(xs: list[float], ys: list[float]) -> float | None:
 
 def compute_trend(annual: list[dict]) -> dict:
     usable = [a for a in annual if a.get("sufficient_coverage")]
-    mk = mann_kendall([float(a["event_count"]) for a in usable])
+    mk = mann_kendall(
+        [float(a["event_count"]) for a in usable],
+        [int(a["year"]) for a in usable],
+    )
     caveats: list[str] = []
     if len(usable) < MIN_VALID_YEARS_FOR_TREND or (
         len(annual) and len(usable) / len(annual) < MIN_VALID_FRACTION_FOR_TREND

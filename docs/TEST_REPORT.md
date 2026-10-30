@@ -1,10 +1,10 @@
-# Test Report (executed 2026-10-13; counts re-verified 2026-10-15, Windows, Python 3.13, Node 25)
+# Test Report (executed 2026-10-13; counts re-verified 2026-10-15 and 2026-10-30, Windows, Python 3.13, Node 25)
 
 ## Summary
 
 | Layer | Command | Passed | Failed | Skipped | Not run |
 |---|---|---|---|---|---|
-| Backend unit/integration/security/perf | `cd backend && pytest` | 125 | 0 | 0 | 0 |
+| Backend unit/integration/security/perf | `cd backend && pytest` | 128 | 0 | 0 | 0 |
 | Backend lint | `ruff check app tests` | pass | — | — | — |
 | Backend format | `ruff format --check app tests` | pass | — | — | — |
 | Backend types | `mypy app` | pass | — | — | — |
@@ -17,7 +17,7 @@
 | CI workflow | `.github/workflows/ci.yml` (runs on GitHub push) | see Actions tab | — | — | — |
 | Live deployment | prod smoke (Vercel→Render→Open-Meteo) | pass (1) | 0 | 0 | 0 |
 
-Backend breakdown (125): heatwave 17 · normalization 12 · trends 9 · mann-kendall 7 ·
+Backend breakdown (128): heatwave 17 · normalization 12 · trends 9 · mann-kendall 10 ·
 validation 28 · weather-client 18 · API/security 15 · cache 9 · mongo-store 7 ·
 performance 3 · conftest fixtures.
 (Counts verified via `pytest --collect-only`; include parametrized cases.)
@@ -46,6 +46,11 @@ branches excluded by design), store 83% (real-server paths), analysis 87%.
 7. Leaflet crashes in jsdom (missing layout APIs): contained with an error boundary
    that keeps manual coordinate entry usable; real map behavior verified by a
    Chromium click-to-select E2E test.
+8. Sen's slope divided by the sample index instead of the year gap, which inflated
+   the per-year rate whenever a low-coverage year was dropped. Found 2026-10-30
+   during interview prep; `mann_kendall` now takes the year series and divides by the
+   real gap, covered by three regression tests (hand-computed 0.5 events/year
+   fixture, bad-input guard, and a `compute_trend` case with two dropped years).
 
 No test was disabled, weakened, or deleted to obtain a green build.
 

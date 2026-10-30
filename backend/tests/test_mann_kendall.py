@@ -2,6 +2,8 @@
 
 import math
 
+import pytest
+
 from app.services.trends import compute_trend, mann_kendall
 
 
@@ -47,6 +49,54 @@ def test_insufficient_observations():
     assert mk["trend"] == "insufficient_data"
     assert mk["s"] is None and mk["p_value"] is None
     assert mann_kendall([])["trend"] == "insufficient_data"
+
+
+def test_sens_slope_uses_year_gaps_not_sample_index():
+    # Usable years are two years apart and counts rise by one each time, i.e.
+    # 0.5 events/year. Index-step math would wrongly report 1.0.
+    values = [0.0, 1.0, 2.0, 3.0]
+    assert mann_kendall(values, [2000, 2002, 2004, 2006])["sens_slope_per_year"] == 0.5
+    assert mann_kendall(values)["sens_slope_per_year"] == 1.0
+
+
+def test_mann_kendall_rejects_mismatched_or_unsorted_years():
+    with pytest.raises(ValueError):
+        mann_kendall([1.0, 2.0, 3.0], [2000, 2001])
+    with pytest.raises(ValueError):
+        mann_kendall([1.0, 2.0, 3.0], [2001, 2000, 2002])
+
+
+def test_compute_trend_sens_slope_uses_calendar_years():
+    # 2003 and 2006 dropped for low coverage: 8 of 10 years usable (>= 70%).
+    annual = [
+        {
+            "year": year,
+            "event_count": i,
+            "total_heatwave_days": i,
+            "mean_duration_days": None,
+            "max_duration_days": None,
+            "mean_intensity_c": None,
+            "max_intensity_c": None,
+            "coverage_fraction": 1.0 if year not in (2003, 2006) else 0.5,
+            "sufficient_coverage": year not in (2003, 2006),
+        }
+        for i, year in enumerate(range(2000, 2010))
+    ]
+    usable = [a for a in annual if a["sufficient_coverage"]]
+    t = compute_trend(annual)
+    # The trend is wired to pass years, so the gap-aware median applies...
+    assert (
+        t["mann_kendall"]["sens_slope_per_year"]
+        == mann_kendall(
+            [float(a["event_count"]) for a in usable],
+            [a["year"] for a in usable],
+        )["sens_slope_per_year"]
+    )
+    # ...and differs from the index-step value that ignored the dropped years.
+    assert (
+        t["mann_kendall"]["sens_slope_per_year"]
+        != mann_kendall([float(a["event_count"]) for a in usable])["sens_slope_per_year"]
+    )
 
 
 def test_nonfinite_rejected():

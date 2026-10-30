@@ -154,7 +154,8 @@ Frontend (`frontend/.env.example`): `VITE_API_BASE_URL` (empty = same origin; pu
    (null) when the early mean is zero. Requires ≥ 5 valid years and ≥ 70% valid-year
    fraction, else `insufficient_data`. A __Mann–Kendall test with Sen's slope__ runs on
    the same series (needs ≥ 4 points; normal-approximation caveat noted for n < 8).
-   All trend output is __descriptive, not causal__.
+   Sen's slope uses the actual calendar-year gap, so years dropped for low coverage
+   do not inflate the per-year rate. All trend output is __descriptive, not causal__.
 
 ## Missing-data and quality rules
 
@@ -198,7 +199,7 @@ Status codes: `200` ok · `400` malformed JSON · `413` too large · `415` wrong
 ## Test commands
 
 ```bash
-# Backend (125 tests: see docs/TEST_REPORT.md for the per-file breakdown)
+# Backend (128 tests: see docs/TEST_REPORT.md for the per-file breakdown)
 cd backend && pytest
 pytest --cov=app --cov-report=term-missing   # 91% total (see test report)
 ruff check app tests && ruff format --check app tests
